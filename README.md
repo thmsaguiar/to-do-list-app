@@ -1,36 +1,210 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# To-Do List APP — Next.js + TypeScript + tRPC + React
 
-## Getting Started
+![GitHub repo size](https://img.shields.io/github/repo-size/thmsaguiar/to-do-list-app)
+![GitHub last commit](https://img.shields.io/github/last-commit/thmsaguiar/to-do-list-app)
+![npm](https://img.shields.io/npm/v/npm)
+![GitHub top language](https://img.shields.io/github/languages/top/thmsaguiar/to-do-list-app)
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## <a name="description">Descrição</a>
+
+Aplicação fullstack de gerenciamento de tarefas desenvolvida com Next.js 15, React e tRPC, como parte de um desafio técnico de Software Engineer.
+
+O projeto tem como objetivo implementar operações CRUD (criação, listagem, atualização e exclusão de tarefas), integrando frontend e backend com tipagem de ponta a ponta (End-to-End Type Safety), validação de dados e tratamento de erros.
+
+A aplicação utiliza estratégias de renderização do Next.js, incluindo Server-Side Rendering (SSR) para carregamento inicial das tarefas, além de componentes funcionais e hooks do React para proporcionar uma experiência de usuário simples, intuitiva e responsiva.
+
+A interface segue uma abordagem Neo-Brutalista, com identidade visual marcante e foco na clareza e usabilidade.
+
+## Índice
+
+1. [Descrição](#description)
+2. [Arquitetura e Decisões Técnicas](#arquitetura)
+3. [Modelagem do Recurso](#modelagem)
+4. [Paginação Escalável](#paginacao)
+5. [Estratégia de Testes](#teste)
+6. [Documentação (OpenAPI 3.0)](#docs)
+7. [Conformidade HTTP](#conformidade)
+8. [Executando](#executando)
+9. [Objetivo Técnico](#objetivo)
+10. [Autor](#autor)
+
+---
+
+## <a name="arquitetura">🧠 Arquitetura e Decisões Técnicas </a>
+### 1️⃣ Stack
+- Next.js 16 (App Router & Server Components)
+- React 19 (Componentes Funcionais & Hooks)
+- TypeScript (Strict Mode)
+- tRPC v11 (Comunicação RPC totalmente tipada)
+- Zod (Validação de esquemas e dados)
+- Tailwind CSS v4 (Estilização e Design Neo-Brutalista)
+
+### 2️⃣ Padrões Arquiteturais Aplicados
+🔹 Separação de responsabilidades
+```markdown
+app/                → Páginas, layout global e Server Components (Next.js)
+app/components/     → Componentes de interface (Toast, Modal de Confirmação, Popover de Tarefa)
+client/             → Cliente tRPC configurado com suporte dinâmico a SSR e Browser
+server/             → Roteador tRPC (appRouter), procedimentos e cache de dados
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 3️⃣ Error Handling Pattern
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Foi implementado um fluxo unificado e centralizado de tratamento de erros tanto no backend quanto no frontend:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- Lançamento de erros estruturados com `TRPCError` no servidor
+- Códigos de erro semânticos (`NOT_FOUND`, `BAD_REQUEST`, `INTERNAL_SERVER_ERROR`)
+- Captura de exceções e exibição em notificações *Toast* com tempo limite no canto superior central da tela
+- Validação reativa no formulário em tempo de digitação, prevenindo envios inválidos
 
-## Learn More
+Exemplo de tratamento com `TRPCError`:
+```ts
+if (!task) {
+  throw new TRPCError({
+    code: "NOT_FOUND",
+    message: "Não foi possível encontrar a tarefa solicitada.",
+  });
+}
+```
 
-To learn more about Next.js, take a look at the following resources:
+Feedback de Erro no Frontend:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- Toast flutuante com tempo limite (auto-dismiss configurável)
+- Alertas visuais destacados dentro do formulário e dos modais
+- Tratamento de falhas de rede com mensagens amigáveis ao usuário
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Esse padrão melhora:
+- Manutenibilidade e clareza do código
+- Experiência do usuário (UX) com feedback imediato
+- Prevenção de travamentos ou falhas silenciosas na aplicação
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 🔐 Segurança Aplicada
+### ✔ Validação Estrita de Entrada com Zod
+```ts
+const taskSchema = z.object({
+  titulo: z.string().trim().min(1, "O título da tarefa é obrigatório."),
+  descricao: z.string().optional(),
+});
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### ✔ Prevenção de Exclusões Acidentais
+
+Proteção contra:
+- Cliques acidentais no botão de exclusão
+- Perda involuntária de dados importantes
+- Modal de confirmação explícito com foco seguro no botão de cancelamento (ESC)
+
+### ✔ Tipagem Estática Ponta a Ponta (Type-Safety)
+Controle de:
+- Contratos de dados compartilhados entre frontend e backend sem geração de código frágil
+- Prevenção de inconsistências entre requisição e resposta em tempo de compilação
+
+---
+
+## <a name="modelagem">📦 Modelagem do Recurso</a>
+Cada Tarefa (Task) contém dados bem definidos e tipados:
+```json
+{
+  "id": "uuid-v4",
+  "titulo": "string",
+  "descricao": "string (opcional)",
+  "dataCriacao": "2026-11-03T01:00:00.000Z"
+}
+```
+
+Motivação:
+- `id` → Identificador único universal gerado via UUID
+- `titulo` → Campo obrigatório com validação visual interativa
+- `descricao` → Detalhamento complementar opcional da tarefa
+- `dataCriacao` → Registro cronológico para ordenação e exibição formatada
+
+---
+
+## <a name="paginacao">📄 Paginação Escalável</a>
+
+A listagem suporta paginação por cursor contínuo via procedimento tRPC:
+```bash
+trpc.taskListPaginated.query({ cursor: 0, limit: 10 })
+```
+
+Implementações importantes:
+- Paginação baseada em cursor incremental
+- Suporte a *Infinite Scroll* com `IntersectionObserver`
+- Indicador visual brutalista de carregamento e aviso de fim da lista
+
+Estrutura de resposta consistente:
+```json
+{
+  "tasks": [
+    {
+      "id": "e4b60e65-27a3-4886-bd76-0f1885b5d5d8",
+      "titulo": "Finalizar documentação",
+      "descricao": "Revisar tópicos do README",
+      "dataCriacao": "2026-11-03T01:00:00.000Z"
+    }
+  ],
+  "nextCursor": 10
+}
+```
+
+---
+
+## <a name="docs">📖 Documentação (OpenAPI 3.0)</a>
+
+Os contratos de API são autodescritivos e tipados via tRPC e esquemas Zod.
+
+A especificação documenta:
+- Procedimentos de Leitura: `taskList`, `taskListPaginated`, `taskById`
+- Procedimentos de Mutação: `taskCreate`, `taskUpdate`, `taskDelete`
+- Tipos de entrada e saída fortemente tipados
+- Mapeamento de códigos de erro e exceções `TRPCError`
+
+Disponível no endpoint:
+```bash
+http://localhost:3000/api/trpc
+```
+
+---
+
+## <a name="conformidade">📊 Conformidade HTTP</a>
+
+Status codes e correspondência semântica tRPC / HTTP:
+- 200 → Sucesso na consulta ou mutação (OK)
+- 400 → Dados de entrada inválidos / Schema Zod rejeitado (Bad Request)
+- 404 → Tarefa não encontrada para edição ou exclusão (Not Found)
+- 500 → Erro interno do servidor / Exceção inesperada (Internal Server Error)
+
+---
+
+## <a name="executando">⚙️ Executando</a>
+Instalar dependências:
+```bash
+npm install
+```
+
+Ambiente de Desenvolvimento:
+```bash
+npm run dev
+```
+
+Compilação de Produção:
+```bash
+npm run build
+```
+
+Verificação de Tipos e Lint:
+```bash
+npx tsc --noEmit
+npm run lint
+```
+
+---
+
+## <a name="autor">👨‍💻 Autor</a>
+
+| [<img src="https://github.com/thmsaguiar.png?size=115" width=115><br><sub>@thmsaguiar</sub>](https://github.com/thmsaguiar) |
+| :---: |
