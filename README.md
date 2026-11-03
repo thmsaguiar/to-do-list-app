@@ -4,10 +4,13 @@
 ![GitHub last commit](https://img.shields.io/github/last-commit/thmsaguiar/to-do-list-app)
 ![npm](https://img.shields.io/npm/v/npm)
 ![GitHub top language](https://img.shields.io/github/languages/top/thmsaguiar/to-do-list-app)
+[![Vercel Deployment](https://img.shields.io/badge/Vercel-Deploy%20Ativo-black?style=flat&logo=vercel)](https://thmsaguiar-todo-app.vercel.app/)
 
 ---
 
 ## <a name="description">Descrição</a>
+
+> 🚀 **Deploy em Produção:** Acesse o projeto online em [https://thmsaguiar-todo-app.vercel.app/](https://thmsaguiar-todo-app.vercel.app/)
 
 Aplicação fullstack de gerenciamento de tarefas desenvolvida com Next.js 15, React e tRPC, como parte de um desafio técnico de Software Engineer.
 
@@ -179,6 +182,12 @@ Status codes e correspondência semântica tRPC / HTTP:
 ---
 
 ## <a name="executando">⚙️ Executando</a>
+
+### 🌐 Acesso Online
+A aplicação está publicada na Vercel e pode ser acessada diretamente em:
+👉 **[https://thmsaguiar-todo-app.vercel.app/](https://thmsaguiar-todo-app.vercel.app/)**
+
+### 💻 Execução Local
 Instalar dependências:
 ```bash
 npm install
