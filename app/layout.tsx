@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Gerenciador Brutalista de Tarefas",
-  description: "Gerencie suas tarefas com eficiência e design neo-brutalista.",
+  title: "Gerenciador de Tarefas",
+  description: "Gerencie suas tarefas com eficiência.",
 };
 
 export default function RootLayout({

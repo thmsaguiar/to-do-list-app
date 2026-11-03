@@ -27,7 +27,7 @@ export default async function Home() {
           <div className="flex items-center gap-2">
             <span className="w-4 h-4 bg-[#FFE600] border-2 border-black inline-block" />
             <span className="font-mono text-xs font-black uppercase tracking-widest text-neutral-800">
-              DESAFIO PRÁTICO // LISTA DE TAREFAS
+              DESAFIO PRÁTICO // GERENCIADOR DE TAREFAS
             </span>
           </div>
 
