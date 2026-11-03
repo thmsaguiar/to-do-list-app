@@ -23,12 +23,10 @@ A interface segue uma abordagem Neo-Brutalista, com identidade visual marcante e
 2. [Arquitetura e Decisões Técnicas](#arquitetura)
 3. [Modelagem do Recurso](#modelagem)
 4. [Paginação Escalável](#paginacao)
-5. [Estratégia de Testes](#teste)
-6. [Documentação (OpenAPI 3.0)](#docs)
-7. [Conformidade HTTP](#conformidade)
-8. [Executando](#executando)
-9. [Objetivo Técnico](#objetivo)
-10. [Autor](#autor)
+5. [Documentação (OpenAPI 3.0)](#docs)
+6. [Conformidade HTTP](#conformidade)
+7. [Executando](#executando)
+8. [Autor](#autor)
 
 ---
 
